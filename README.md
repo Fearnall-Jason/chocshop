@@ -1,5 +1,3 @@
-# chocshop
-
 # ChocShop SQL
 
 This repository contains the `chocshop.sql` file, a script for setting up and populating a database for a chocolate shop.
