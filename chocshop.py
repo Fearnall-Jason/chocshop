@@ -16,10 +16,9 @@ from tabulate import tabulate
 
 db =  None
 
-
-
 # Function to login to the database
 def login():
+
     global db
     while True:
         email = input("Enter your email (or 'q' to quit): ") 
@@ -44,7 +43,6 @@ def login():
             print("Login successful!\n")
             return 
 
-
 # define function to view all chocolates
 def view_chocolates():
     cursor = db.cursor()
@@ -54,8 +52,6 @@ def view_chocolates():
     for chocolate in chocolates:
         table.add_row([chocolate[0], chocolate[1], chocolate[2]])
     print(table)
-
-
 
 # define function to view all items in an order
 def view_order_items(order_id):
@@ -77,8 +73,6 @@ def view_order_items(order_id):
         table.add_row([item[0], item[1], item[2], item[3]])
 
     print(table)
-
-
 
 # define function to view all orders by a customer
 def orders_by_cust(cust_id):
@@ -123,8 +117,6 @@ def orders_by_cust(cust_id):
         order_id = input("Multiple orders found. Please enter the order ID: ")
         orders_by_order(order_id)
     return True
-
-
 
 # define function to view all orders by a customer
 def orders_by_order(order_id):
@@ -179,7 +171,6 @@ def orders_by_order(order_id):
         else:
             print("Invalid choice. Please try again.")
 
-
 # define function to place an order
 def place_order(cust_id):
     cursor = db.cursor()
@@ -232,14 +223,12 @@ def place_order(cust_id):
     if verify.lower() == 'y':
         for item in order_items:
             cursor.execute("INSERT INTO order_items (order_id, choc_id, quantity) VALUES (%s, %s, %s)", (order_id, item['choc_id'], item['quantity']))
-            cursor.execute("UPDATE orders SET subtotal = (SELECT SUM(chocolate.price * quantity) FROM order_items INNER JOIN chocolate ON order_items.choc_id = chocolate.choc_id WHERE order_id = %s) WHERE order_id = %s", (order_id, order_id))
+            cursor.execute("""UPDATE orders SET subtotal = (SELECT SUM(chocolate.price * quantity) FROM order_items 
+                                INNER JOIN chocolate ON order_items.choc_id = chocolate.choc_id WHERE order_id = %s) WHERE order_id = %s""", (order_id, order_id))
         db.commit()
         print("Order committed to the database.")
     else:
         print("Order not committed.")
-
-
-
 
 # define function to view, edit, or delete orders  
 def view_orders():
@@ -253,15 +242,18 @@ def view_orders():
     elif search_option.isdigit():
         orders_by_order(search_option)
     elif search_option == 'all':
-        query = "SELECT orders.order_id, customer.name, orders.order_date, orders.subtotal FROM orders INNER JOIN customer ON orders.cust_id = customer.cust_id"
+        query = """SELECT orders.order_id, customer.name, orders.order_date, orders.subtotal FROM orders 
+                        INNER JOIN customer ON orders.cust_id = customer.cust_id"""
         cursor.execute(query)
     else:
         try:
             datetime.datetime.strptime(search_option, '%Y-%m-%d')
-            query = "SELECT orders.order_id, customer.name, orders.order_date, orders.subtotal FROM orders INNER JOIN customer ON orders.cust_id = customer.cust_id WHERE orders.order_date = %s"
+            query = """SELECT orders.order_id, customer.name, orders.order_date, orders.subtotal FROM orders 
+                            INNER JOIN customer ON orders.cust_id = customer.cust_id WHERE orders.order_date = %s"""
             cursor.execute(query, (search_option,))
         except ValueError:
-            query = "SELECT orders.order_id, customer.name, orders.order_date, orders.subtotal FROM orders INNER JOIN customer ON orders.cust_id = customer.cust_id WHERE customer.name LIKE %s"
+            query = """SELECT orders.order_id, customer.name, orders.order_date, orders.subtotal FROM orders 
+                            INNER JOIN customer ON orders.cust_id = customer.cust_id WHERE customer.name LIKE %s"""
             cursor.execute(query, ('%' + search_option + '%',))
 
     try:
@@ -282,8 +274,6 @@ def view_orders():
 
     order_id = input("Enter the ID of the order you want to view: ")
     orders_by_order(order_id)
-
-
 
 # define delete order function
 def delete_order(order_id):
@@ -331,10 +321,6 @@ def delete_order(order_id):
         else:
             print("Invalid input. Please enter 'y' or 'n'.")
 
-
-
-
-
 # Function to view all orders
 def view_all_orders():
     cursor = db.cursor()
@@ -357,9 +343,6 @@ def view_all_orders():
 
     print(table)
    
-
-
-
 # Function to add a new customer
 def add_customer():
     cursor = db.cursor()
@@ -385,9 +368,6 @@ def add_customer():
         except Exception as e:
             print("\nAn error occurred: ", str(e))
             print("Please try again.\n")
-
-
-
 
 # Function to edit a customer
 def edit_customer(cust_id):
@@ -421,9 +401,6 @@ def edit_customer(cust_id):
             elif confirm.lower() == 'q':
                 return
             
-
-
-
 # define function to delete a customer
 def delete_customer(cust_id):
     cursor = db.cursor()
@@ -454,8 +431,6 @@ def delete_customer(cust_id):
     db.commit()
     print("Customer deleted successfully.")
 
-
-
 #define search customer function
 def search_customer():
     cursor = db.cursor()
@@ -474,7 +449,6 @@ def search_customer():
     cursor.execute(query, params)
     results = cursor.fetchall()
 
- 
     if not results:
         print("No customers found.")
         return
@@ -518,18 +492,15 @@ def search_customer():
             else:
                 print("Invalid choice. Please enter 1, 2, 3, or 4.")
 
-
-
-                
-
 def main():
 
     print("\n\nWelcome to the Choc Shop!\n\n")
 
     login()
 
+    print("\n\nWelcome to the Choc Shop!\n\n")
+
     while True:
-        print("\n\nWelcome to the Choc Shop!\n\n")
         print("\n1. View chocolates")
         print("2. Place order")
         print("3. Add new customer")
