@@ -63,7 +63,7 @@ def view_order_items(order_id):
     query = """
         SELECT order_items.choc_id, order_items.order_id, chocolate.type, order_items.quantity
         FROM order_items
-        INNER JOIN chocolate ON order_items.product_id = chocolate.product_id
+        INNER JOIN chocolate ON order_items.choc_id = chocolate.choc_id
         WHERE order_items.order_id = %s
     """
     cursor.execute(query, (order_id,))
@@ -178,8 +178,6 @@ def orders_by_order(order_id):
             break
         else:
             print("Invalid choice. Please try again.")
-
-
 
 
 # define function to place an order
@@ -552,9 +550,6 @@ def main():
             break
         else:
             print("Invalid choice. Please try again.")
-
-\
-\
 
 if __name__ == "__main__":
     main()
